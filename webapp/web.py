@@ -14,23 +14,13 @@ def valid_sign():
     timestamp = request.args.get('timestamp').encode("utf-8")
     nonce = request.args.get('nonce').encode("utf-8")
 
-    app.logger.debug('signature: %s', signature)
-    app.logger.debug('timestamp: %s', timestamp)
-    app.logger.debug('nonce: %s', nonce)
-
-    token = TOKEN
-
-    lst = [token, timestamp, nonce]
+    lst = [TOKEN, timestamp, nonce]
     lst.sort()
+
     tmp_str = ''.join(lst)
-
     tmp_str = hashlib.sha1(tmp_str).hexdigest()
-    app.logger.debug('tmp_str: %s', tmp_str)
 
-    if tmp_str == signature :
-        return True
-    else:
-        return False
+    return True if tmp_str == signature else False
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -51,3 +41,4 @@ if __name__ == '__main__':
     app.logger.addHandler(handler)
 
     app.run(host='0.0.0.0')
+    # app.logger.debug('tmp_str: %s', tmp_str)
