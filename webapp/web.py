@@ -47,11 +47,12 @@ def index():
     if request.method == 'POST':
         wx_msg = parse()
 
-        app.logger.debug('http post data: %s;%s;%s;%s;%s;%s' % (wx_msg['FromUserName'], wx_msg['ToUserName'], 
+        app.logger.info('http post data: %s;%s;%s;%s;%s;%s' % (wx_msg['FromUserName'], wx_msg['ToUserName'], 
             wx_msg['CreateTime'], wx_msg['MsgType'], wx_msg['MsgId'], wx_msg['Content']))
 
         if re.match('EA\d{9}NL', wx_msg['Content']):
             status = retrieve_delivery_status(wx_msg['Content'])
+            app.logger.debug('ems status:\n%s', status)
             return rsp % (wx_msg['FromUserName'], wx_msg['ToUserName'], int(time.time()), wx_msg['MsgType'], status)
 
         return "success"
@@ -70,4 +71,4 @@ if __name__ == '__main__':
     app.logger.addHandler(handler)
 
     app.run(host='0.0.0.0')
-    # app.logger.debug('tmp_str: %s', tmp_str)
+

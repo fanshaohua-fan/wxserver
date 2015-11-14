@@ -6,7 +6,7 @@ from lxml import html
 import httplib2
 
 
-httplib2.debuglevel = 0
+#httplib2.debuglevel = 1
 h = httplib2.Http('.cache')
 
 def process_image(url):
@@ -14,11 +14,7 @@ def process_image(url):
     image = Image.open(StringIO(content)) 
     return pytesseract.image_to_string(image), response.get('set-cookie')
 
-def retrieve_delivery_status(mailNum):
-    url_ocr = 'http://www.ems.com.cn/ems/rand'
-    url_order_status = 'http://www.ems.com.cn/ems/order/singleQuery_t'
-
-    checkCode, cookie = process_image(url_ocr)
+def query_order(mailNum, checkCode, cookie):
     data = {'mailNum' : mailNum, 'checkCode' : checkCode}
     # because there are 2 set-cookie in the response of get_image
     # you cannot directly use response['set-cookie'] as request['Cookie']
@@ -26,21 +22,33 @@ def retrieve_delivery_status(mailNum):
     # Set-Cookie: BIGipServerweb_pool=168493834.40735.0000; path=/
     headers={'Cookie': cookie.replace(',', ';'), 'Content-Type':'application/x-www-form-urlencoded', 'Accept':'*/*'}
 
-    response, content = h.request(url_order_status, 
+    response, content = h.request( 'http://www.ems.com.cn/ems/order/singleQuery_t',
         'POST',
         urlencode(data),
         headers)
 
+    return content
+
+def scrape_html(content):
     tree = html.fromstring(content)
-    delivery = tree.xpath('//div[@id="s_div"]/table/tr/td/text()')
-
-    for i, data in enumerate(delivery):
-        delivery[i] = data.strip()
-
+    list_delivery = tree.xpath('//table[@id="showTable"]/tr')
     s = ''
-    for data in delivery:
-        s += data + '\n'
+
+    for tr in list_delivery:
+        for td in tr.itertext():
+            s += td.strip() + ' '
+        s += '\n'
 
     return s
+    
+
+def retrieve_delivery_status(mailNum):
+    url_ocr = 'http://www.ems.com.cn/ems/rand'
+
+    checkCode, cookie = process_image(url_ocr)
+    content = query_order(mailNum, checkCode, cookie)
+    status = scrape_html(content)
+
+    return status
 
 #EA038500686NL
