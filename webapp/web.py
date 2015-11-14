@@ -3,13 +3,23 @@ from flask import render_template
 from flask import request
 
 from logging.handlers import RotatingFileHandler
+from ocr import retrieve_delivery_status
 
 import hashlib
 import logging
+import re
+import time
 import xml.etree.ElementTree as ET
 
 app = Flask(__name__)
 TOKEN = 'fanshaohua'
+rsp = '''<xml>
+<ToUserName><![CDATA[%s]]></ToUserName>
+<FromUserName><![CDATA[%s]]></FromUserName>
+<CreateTime>%d</CreateTime>
+<MsgType><![CDATA[%s]]></MsgType>
+<Content><![CDATA[%s]]></Content>
+</xml>'''
 
 def valid_sign():
     signature = request.args.get('signature').encode("utf-8")
@@ -39,6 +49,11 @@ def index():
 
         app.logger.debug('http post data: %s;%s;%s;%s;%s;%s' % (wx_msg['FromUserName'], wx_msg['ToUserName'], 
             wx_msg['CreateTime'], wx_msg['MsgType'], wx_msg['MsgId'], wx_msg['Content']))
+
+        if re.match('EA\d{9}NL', wx_msg['Content']):
+            status = retrieve_delivery_status(wx_msg['Content'])
+            return rsp % (wx_msg['FromUserName'], wx_msg['ToUserName'], int(time.time()), wx_msg['MsgType'], status)
+
         return "success"
 
     timestamp = request.args.get('timestamp')

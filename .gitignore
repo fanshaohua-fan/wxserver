@@ -1,1 +1,3 @@
 webapp/*.log
+webapp/.cache
+webapp/*.pyc
