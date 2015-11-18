@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pytesseract
 from PIL import Image
 from StringIO import StringIO
@@ -15,14 +16,16 @@ def process_image(url):
     return pytesseract.image_to_string(image), response.get('set-cookie')
 
 def query_order(mailNum, checkCode, cookie):
-    data = {'mailNum' : mailNum, 'checkCode' : checkCode}
+    data = {'mailNum': mailNum, 'checkCode': checkCode}
     # because there are 2 set-cookie in the response of get_image
     # you cannot directly use response['set-cookie'] as request['Cookie']
     # Set-Cookie: JSESSIONID=C7LZWGGccR1h9lQChCGnVKPV9R01qFwfnQhpvRGNVpDsysx2pJ4F!-554346888; path=/; HttpOnly
     # Set-Cookie: BIGipServerweb_pool=168493834.40735.0000; path=/
-    headers={'Cookie': cookie.replace(',', ';'), 'Content-Type':'application/x-www-form-urlencoded', 'Accept':'*/*'}
+    headers={'Cookie': cookie.replace(',', ';'),
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': '*/*'}
 
-    response, content = h.request( 'http://www.ems.com.cn/ems/order/singleQuery_t',
+    response, content = h.request('http://www.ems.com.cn/ems/order/singleQuery_t',
         'POST',
         urlencode(data),
         headers)
@@ -39,7 +42,9 @@ def scrape_html(content):
             s += td.strip() + ' '
         s += '\n'
 
-    return s
+    # strip here to handle the empty result
+    s = s.strip()
+    return s if s != '' else 'No delivery detail for this order!'
     
 
 def retrieve_delivery_status(mailNum):

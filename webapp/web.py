@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import Flask
 from flask import render_template
 from flask import request
@@ -19,7 +20,8 @@ rsp = '''<xml>
 <CreateTime>%d</CreateTime>
 <MsgType><![CDATA[%s]]></MsgType>
 <Content><![CDATA[%s]]></Content>
-</xml>'''
+</xml>
+'''
 
 def valid_sign():
     signature = request.args.get('signature').encode("utf-8")
@@ -47,13 +49,23 @@ def index():
     if request.method == 'POST':
         wx_msg = parse()
 
-        app.logger.info('http post data: %s;%s;%s;%s;%s;%s' % (wx_msg['FromUserName'], wx_msg['ToUserName'], 
-            wx_msg['CreateTime'], wx_msg['MsgType'], wx_msg['MsgId'], wx_msg['Content']))
+        app.logger.info('http post data: %s;%s;%s;%s;%s;%s' % (
+            wx_msg['FromUserName'],
+            wx_msg['ToUserName'],
+            wx_msg['CreateTime'],
+            wx_msg['MsgType'],
+            wx_msg['MsgId'],
+            wx_msg['Content']))
 
         if re.match('EA\d{9}NL', wx_msg['Content']):
             status = retrieve_delivery_status(wx_msg['Content'])
             app.logger.debug('ems status:\n%s', status)
-            return rsp % (wx_msg['FromUserName'], wx_msg['ToUserName'], int(time.time()), wx_msg['MsgType'], status)
+            return rsp % (
+                wx_msg['FromUserName'],
+                wx_msg['ToUserName'],
+                int(time.time()),
+                wx_msg['MsgType'],
+                status)
 
         return "success"
 
