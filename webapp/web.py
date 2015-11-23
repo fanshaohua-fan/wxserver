@@ -57,8 +57,8 @@ def index():
             wx_msg['MsgId'],
             wx_msg['Content']))
 
-        if re.match('EA\d{9}NL', wx_msg['Content']):
-            status = retrieve_delivery_status(wx_msg['Content'])
+        if re.match('EA\d{9}NL', wx_msg['Content'].upper()):
+            status = retrieve_delivery_status(wx_msg['Content'].upper())
             app.logger.debug('ems status:\n%s', status)
             return rsp % (
                 wx_msg['FromUserName'],
