@@ -1,3 +1,5 @@
+.cache
 webapp/*.log
 webapp/.cache
 webapp/*.pyc
+test/*.pyc
