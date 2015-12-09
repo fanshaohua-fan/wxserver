@@ -49,15 +49,14 @@ def index():
     if request.method == 'POST':
         wx_msg = parse()
 
-        app.logger.info('http post data: %s;%s;%s;%s;%s;%s' % (
+        app.logger.info('http post data: %s;%s;%s;%s' % (
             wx_msg['FromUserName'],
             wx_msg['ToUserName'],
             wx_msg['CreateTime'],
-            wx_msg['MsgType'],
-            wx_msg['MsgId'],
-            wx_msg['Content']))
+            wx_msg['MsgType']
+            ))
 
-        if re.match('EA\d{9}NL', wx_msg['Content'].upper()):
+        if wx_msg.has_key('Content') and re.match('EA\d{9}NL', wx_msg['Content'].upper()):
             status = retrieve_delivery_status(wx_msg['Content'].upper())
             app.logger.debug('ems status:\n%s', status)
             return rsp % (
