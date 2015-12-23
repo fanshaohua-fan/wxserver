@@ -7,5 +7,6 @@ RUN apt-get install -y \
     tesseract-ocr \
     python-lxml
 RUN pip install Flask \
+    Flask-SQLAlchemy \
     pytesseract
 WORKDIR /app

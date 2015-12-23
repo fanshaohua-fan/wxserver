@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from flask import Flask
-from flask import render_template
+from base import app
+from base import db
+from model import WeChatMessage
 from flask import request
 
 from logging.handlers import RotatingFileHandler
@@ -12,8 +13,7 @@ import re
 import time
 import xml.etree.ElementTree as ET
 
-app = Flask(__name__)
-TOKEN = 'fanshaohua'
+
 rsp = '''<xml>
 <ToUserName><![CDATA[%s]]></ToUserName>
 <FromUserName><![CDATA[%s]]></FromUserName>
@@ -23,12 +23,13 @@ rsp = '''<xml>
 </xml>
 '''
 
+
 def valid_sign():
     signature = request.args.get('signature').encode("utf-8")
     timestamp = request.args.get('timestamp').encode("utf-8")
     nonce = request.args.get('nonce').encode("utf-8")
 
-    lst = [TOKEN, timestamp, nonce]
+    lst = [app.config['TOKEN'], timestamp, nonce]
     lst.sort()
 
     tmp_str = ''.join(lst)
@@ -56,6 +57,10 @@ def index():
             wx_msg['MsgType']
             ))
 
+        wechat_message = WeChatMessage(**wx_msg)
+        db.session.add(wechat_message)
+        db.session.commit()
+
         if wx_msg.has_key('Content') and re.match('EA\d{9}NL', wx_msg['Content'].upper()):
             status = retrieve_delivery_status(wx_msg['Content'].upper())
             app.logger.debug('ems status:\n%s', status)
@@ -75,7 +80,6 @@ def index():
     return request.args.get('echostr') if valid_sign() else "verification failed!"
 
 if __name__ == '__main__':
-    app.debug = True
 
     handler = RotatingFileHandler('foo.log', maxBytes=10000, backupCount=1)
     handler.setLevel(logging.DEBUG)
