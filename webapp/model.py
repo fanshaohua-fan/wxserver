@@ -10,7 +10,7 @@ class WeChatMessage(db.Model):
     FromUserName = db.Column(db.String(32), nullable=False)
     CreateTime = db.Column(db.Integer, nullable=False)
     MsgType = db.Column(db.String(32), nullable=False)
-    MsgId = db.Column(db.Integer, nullable=False)
+    MsgId = db.Column(db.BigInteger, nullable=False)
 
     # text 
     Content = db.Column(db.String(2048))
@@ -63,7 +63,7 @@ class WeChatMessage(db.Model):
             self.MediaId = kw['MediaId']
             self.ThumbMediaId = kw['ThumbMediaId']
         # location
-        elif self.MsgType == 'Location':
+        elif self.MsgType == 'location':
             self.Location_X = kw['Location_X']
             self.Location_Y = kw['Location_Y']
             self.Scale = kw['Scale']
@@ -75,3 +75,44 @@ class WeChatMessage(db.Model):
             self.Url = kw['Url']
         else:
             pass
+
+
+class WeChatEvent(db.Model):
+    __tablename__ = 'wechat_events'
+
+    id = db.Column(db.Integer, primary_key=True)
+    ToUserName = db.Column(db.String(32), nullable=False)
+    FromUserName = db.Column(db.String(32), nullable=False)
+    CreateTime = db.Column(db.Integer, nullable=False)
+    MsgType = db.Column(db.String(32), nullable=False)
+    Event = db.Column(db.String(32), nullable=False)
+
+    # SCAN
+    EventKey = db.Column(db.String(255))
+    Ticket = db.Column(db.String(255))
+    # LOCATION
+    Latitude = db.Column(db.Float)
+    Longitude = db.Column(db.Float)
+    Precision = db.Column(db.Float)
+    # CLICK EventKey
+    # VIEW EventKey
+
+    def __init__(self, **kw):
+        self.ToUserName = kw['ToUserName']
+        self.FromUserName = kw['FromUserName']
+        self.CreateTime = kw['CreateTime']
+        self.MsgType = kw['MsgType']
+        self.Event = kw['Event']
+
+        if self.Event == 'CLICK' or self.Event == 'VIEW':
+            self.EventKey = kw['EventKey']
+        elif self.Event == 'SCAN':
+            self.EventKey = kw['EventKey']
+            self.Ticket = kw['Ticket']
+        elif self.Event == 'LOCATION':
+            self.Latitude = kw['Latitude']
+            self.Longitude = kw['Longitude']
+            self.Precision = kw['Precision']
+        else:
+            pass
+

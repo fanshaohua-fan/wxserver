@@ -2,6 +2,7 @@
 from base import app
 from base import db
 from model import WeChatMessage
+from model import WeChatEvent
 from flask import request
 
 from logging.handlers import RotatingFileHandler
@@ -57,8 +58,12 @@ def index():
             wx_msg['MsgType']
             ))
 
-        wechat_message = WeChatMessage(**wx_msg)
-        db.session.add(wechat_message)
+        if wx_msg['MsgType'] == 'event':
+            db_msg = WeChatEvent(**wx_msg)
+        else:
+            db_msg = WeChatMessage(**wx_msg)
+
+        db.session.add(db_msg)
         db.session.commit()
 
         if wx_msg.has_key('Content') and re.match('EA\d{9}NL', wx_msg['Content'].upper()):
