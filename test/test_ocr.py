@@ -1,27 +1,26 @@
 import unittest
-import re
-from webapp import ocr
+import json
+from Captcha import Captcha
+
 
 class TestOCR(unittest.TestCase):
 
-    def test_process_image(self):
+    def test_ocr(self):
         url = 'http://www.ems.com.cn/ems/rand'
-        d = ocr.process_image(url)
+        captcha = Captcha(url)
+        captcha.ocr()
 
-        self.assertTrue(re.match('\d{6}', d[0]))
-        self.assertTrue(isinstance(d[1], str))
+        self.assertTrue(captcha.status, 200)
 
-    def test_retrieve_delivery_status(self):
-        mail = 'EA038500686NL'
-        d = ocr.retrieve_delivery_status(mail)
+    def test_json(self):
+        url = 'http://www.ems.com.cn/ems/rand'
+        captcha = Captcha(url)
+        captcha.ocr()
 
-        self.assertTrue(d)
+        response = json.loads(captcha.json())
 
-    def test_retrieve_delivery_status_invalid(self):
-        mail = 'EA03850068NL'
-        d = ocr.retrieve_delivery_status(mail)
+        self.assertTrue(response.get('status'), 200)
 
-        self.assertEqual(d, 'No delivery detail for this order!')
 
 if __name__ == '__main__':
     unittest.main()
