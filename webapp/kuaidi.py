@@ -31,7 +31,7 @@ class kuaidi_oto(kuaidi):
         c = json.loads(content)
         # ems status
         ems = c.get('obj').get('clist')
-        if ems.has_key('data'):
+        if ems is not None and ems.has_key('data'):
             li = ems.get('data')
             for l in li:
                 status += l.get('context') + '\n'
