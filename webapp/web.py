@@ -4,10 +4,9 @@ from base import db
 from model import WeChatMessage
 from model import WeChatEvent
 from flask import request
-from kuaidi import kuaidi_oto
+from kuaidi import kuaidi_oto, kuaidi_ems
 
 from logging.handlers import RotatingFileHandler
-from ocr import retrieve_delivery_status
 
 import hashlib
 import logging
@@ -67,26 +66,26 @@ def index():
         db.session.add(db_msg)
         db.session.commit()
 
-        if wx_msg.has_key('Content') and re.match('\d{11}[A-Z]\d', wx_msg['Content'].upper()):
-            oto = kuaidi_oto(wx_msg['Content'].upper())
-            status = oto.status()
-            app.logger.debug('oto status:\n%s', status)
-            return rsp % (
-                wx_msg['FromUserName'],
-                wx_msg['ToUserName'],
-                int(time.time()),
-                wx_msg['MsgType'],
-                status)
+        if wx_msg.has_key('Content'):
+            content = wx_msg['Content'].upper()
 
-        if wx_msg.has_key('Content') and re.match('EA\d{9}NL', wx_msg['Content'].upper()):
-            status = retrieve_delivery_status(wx_msg['Content'].upper())
-            app.logger.debug('ems status:\n%s', status)
-            return rsp % (
-                wx_msg['FromUserName'],
-                wx_msg['ToUserName'],
-                int(time.time()),
-                wx_msg['MsgType'],
-                status)
+            delivery = None
+            if re.match('\d{11}[A-Z]\d', content):
+                delivery = kuaidi_oto(content)
+            elif re.match('EA\d{9}NL', content):
+                delivery = kuaidi_ems(content)
+            else:
+                pass
+
+            if delivery is not None:
+                status = delivery.status()
+                app.logger.debug('%s status:\n%s', delivery.name, status)
+                return rsp % (
+                    wx_msg['FromUserName'],
+                    wx_msg['ToUserName'],
+                    int(time.time()),
+                    wx_msg['MsgType'],
+                    status)
 
         return "success"
 

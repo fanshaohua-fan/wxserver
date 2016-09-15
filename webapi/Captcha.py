@@ -13,7 +13,7 @@ class Captcha(object):
     def ocr(self):
         h = httplib2.Http('.cache')
         response, content = h.request(self.url)
-        self.cookie = response.get('set-cookie')
+        self.cookie = response.get('set-cookie').replace(',', ';')
 
         image = Image.open(BytesIO(content)) 
         self.result = pytesseract.image_to_string(image)

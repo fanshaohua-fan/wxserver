@@ -10,6 +10,7 @@ app = Flask(__name__)
 def index():
     if request.method == 'POST':
         url = request.form['url']
+        #app.logger.info('url :\n%s', url)
         captcha = Captcha(url)
         captcha.ocr()
         return captcha.json()
