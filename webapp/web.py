@@ -63,11 +63,14 @@ def index():
         else:
             db_msg = WeChatMessage(**wx_msg)
 
-        db.session.add(db_msg)
-        db.session.commit()
+        try:
+            db.session.add(db_msg)
+            db.session.commit()
+        except Exception as e:
+            pass
 
         if wx_msg.has_key('Content'):
-            content = wx_msg['Content'].upper()
+            content = wx_msg['Content'].upper().strip()
 
             delivery = None
             if re.match('\d{11}[A-Z]\d', content):
