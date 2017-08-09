@@ -54,7 +54,7 @@ class kuaidi_ems(kuaidi):
 
         response, content = h.request(self.url, 'POST', urlencode(data), headers)
 
-        return self.__format(content)
+        return self.__format(content.decode('utf-8'))
 
 class kuaidi_oto(kuaidi):
     def __init__(self, orderno):
@@ -87,7 +87,7 @@ class kuaidi_oto(kuaidi):
         headers={'Referer': 'http://www.otobv.com'}
         response, content = h.request(self.url % self.orderno, 'GET', None, headers)
 
-        return self.__format(content)
+        return self.__format(content.decode('utf-8'))
 
 
 class kuaidi_euasia(kuaidi):
@@ -111,8 +111,8 @@ class kuaidi_euasia(kuaidi):
         return status if status != '' else 'No delivery detail for this order!'
 
     def status(self):
-        headers={'Referer': 'http://www.nlebv.com'}
+        headers={'Referer': 'http://www.nlebv.com', 'Content-Type': 'application/x-www-form-urlencoded'}
         response, content = h.request(self.url % self.orderno, 'GET', None, headers)
 
-        return self.__format(content)
+        return self.__format(content.decode('utf-8'))
 
