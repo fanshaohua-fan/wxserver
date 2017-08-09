@@ -90,3 +90,29 @@ class kuaidi_oto(kuaidi):
         return self.__format(content)
 
 
+class kuaidi_euasia(kuaidi):
+    def __init__(self, orderno):
+        self.name = 'euasia'
+        # http://www.nlebv.com/search/order_search?com=euasia&num=EAXON2150036&postalCode=
+        self.url = 'http://www.nlebv.com/search/order_search?com=euasia&num=%s'
+        self.orderno = orderno
+
+    def __format(self, content):
+        tree = html.fromstring(content)
+        delivery = tree.xpath('//div[@class="search-results"]/div')
+        status = ''
+
+        for tr in delivery:
+            status += tr.getchildren()[0].text.strip() + ' ' + tr.getchildren()[2].text.strip()
+            status += '\n'
+
+        # strip here to handle the empty result
+        status = status.strip()
+        return status if status != '' else 'No delivery detail for this order!'
+
+    def status(self):
+        headers={'Referer': 'http://www.nlebv.com'}
+        response, content = h.request(self.url % self.orderno, 'GET', None, headers)
+
+        return self.__format(content)
+

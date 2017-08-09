@@ -77,6 +77,8 @@ def index():
                 delivery = kuaidi_oto(content)
             elif re.match('EA\d{9}NL', content):
                 delivery = kuaidi_ems(content)
+            elif re.match('EAXON\d{7}', content):
+                delivery = kuaidi_euasia(content)
             else:
                 pass
 
