@@ -4,7 +4,7 @@ from base import db
 from model import WeChatMessage
 from model import WeChatEvent
 from flask import request
-from kuaidi import kuaidi_oto, kuaidi_ems
+from kuaidi import kuaidi_oto, kuaidi_ems, kuaidi_euasia
 
 from logging.handlers import RotatingFileHandler
 
