@@ -99,7 +99,9 @@ class kuaidi_euasia(kuaidi):
 
     def __format(self, content):
         tree = html.fromstring(content)
-        delivery = tree.xpath('//div[@class="search-results"]/div')
+        # updated by Fan 20190402
+        # delivery = tree.xpath('//div[@class="search-results"]/div')
+        delivery = tree.xpath('//div[@class="express hide"]/div')
         status = ''
 
         for tr in delivery:
