@@ -1,0 +1,7 @@
+.cache
+webapp/*.log
+webapp/*.log.*
+webapp/.cache
+webapp/*.pyc
+test/*.pyc
+webapi/*cache*

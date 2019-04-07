@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from urllib import urlencode
+from urllib.parse import urlencode
 from lxml import html
 import httplib2
 import json

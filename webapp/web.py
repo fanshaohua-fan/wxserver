@@ -51,7 +51,7 @@ def index():
     if request.method == 'POST':
         wx_msg = parse()
 
-        app.logger.info('http post data: %s;%s;%s;%s' % (
+        app.logger.debug('http post data: %s;%s;%s;%s' % (
             wx_msg['FromUserName'],
             wx_msg['ToUserName'],
             wx_msg['CreateTime'],
@@ -69,7 +69,7 @@ def index():
         except Exception as e:
             pass
 
-        if wx_msg.has_key('Content'):
+        if 'Content' in wx_msg.keys():
             content = wx_msg['Content'].upper().strip()
 
             delivery = None
